@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Modhesh Admin</title>
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+  <!-- Sign in -->
+  <section id="login-view" class="login" hidden>
+    <form id="login-form" class="login-card">
+      <img src="/api/images/file/app-logo.png" alt="" class="login-logo" />
+      <h1>Modhesh Admin</h1>
+      <label>Username<input name="username" autocomplete="username" required /></label>
+      <label>Password<input name="password" type="password" autocomplete="current-password" required /></label>
+      <p class="form-error" id="login-error" hidden></p>
+      <button class="btn primary" type="submit">Sign in</button>
+    </form>
+  </section>
+
+  <!-- App -->
+  <div id="app-view" hidden>
+    <header class="topbar">
+      <div class="brand">
+        <img src="/api/images/file/app-logo.png" alt="" />
+        <span>Modhesh Admin</span>
+      </div>
+      <nav class="tabs" role="tablist">
+        <button class="tab" data-tab="offers" role="tab">Offers</button>
+        <button class="tab" data-tab="stores" role="tab">Stores</button>
+        <button class="tab" data-tab="settings" role="tab">App settings</button>
+      </nav>
+      <button class="btn ghost" id="logout">Sign out</button>
+    </header>
+
+    <main class="content">
+      <!-- Offers -->
+      <section data-panel="offers" hidden>
+        <div class="toolbar">
+          <h2>Offers <span class="count" id="offers-count"></span></h2>
+          <div class="toolbar-actions">
+            <input type="search" id="offers-search" placeholder="Search offers" />
+            <select id="offers-store-filter"><option value="">All stores</option></select>
+            <button class="btn primary" id="add-offer">+ Add offer</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th></th><th>Offer</th><th>Store</th><th>Sector</th><th>Ends</th><th></th></tr></thead>
+            <tbody id="offers-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Stores -->
+      <section data-panel="stores" hidden>
+        <div class="toolbar">
+          <h2>Stores <span class="count" id="stores-count"></span></h2>
+          <div class="toolbar-actions">
+            <input type="search" id="stores-search" placeholder="Search stores" />
+            <button class="btn primary" id="add-store">+ Add store</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th></th><th>Store</th><th>Sector</th><th>Address</th><th>Rating</th><th>Offers</th><th></th></tr></thead>
+            <tbody id="stores-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Settings -->
+      <section data-panel="settings" hidden>
+        <form id="settings-form">
+          <div class="toolbar">
+            <h2>App settings</h2>
+            <button class="btn primary" type="submit">Save settings</button>
+          </div>
+          <p class="hint">Changes show in the mobile app the next time it opens.</p>
+
+          <div class="card">
+            <h3>Home banners</h3>
+            <p class="hint">Rotating ads at the top of the home and sector pages, in this order.</p>
+            <div id="slides-list" class="slides"></div>
+            <label class="btn secondary file-btn">+ Add banner image
+              <input type="file" accept="image/*" id="slide-upload" hidden />
+            </label>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <h3>Ad popup</h3>
+              <p class="hint">Shown once each time the app opens. Leave the image empty to turn it off.</p>
+              <div class="image-field" data-setting="AD_POPUP_IMAGE"></div>
+              <label>Close after (seconds)<input name="AD_POPUP_SECONDS" type="number" min="1" max="30" /></label>
+            </div>
+
+            <div class="card">
+              <h3>Official sponsor</h3>
+              <p class="hint">Strip at the top of the app. Leave the name empty to hide it.</p>
+              <label>Sponsor name<input name="SPONSOR_NAME" /></label>
+              <label>Sponsor link<input name="SPONSOR_URL" type="url" placeholder="https://" /></label>
+              <div class="image-field" data-setting="SPONSOR_LOGO" data-label="Sponsor logo"></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Sector images</h3>
+            <div class="grid-3" id="sector-images"></div>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <h3>Social links</h3>
+              <p class="hint">Empty links are hidden in the app footer.</p>
+              <label>Facebook<input name="SOCIAL_FACEBOOK_URL" type="url" placeholder="https://" /></label>
+              <label>Instagram<input name="SOCIAL_INSTAGRAM_URL" type="url" placeholder="https://" /></label>
+              <label>WhatsApp<input name="SOCIAL_WHATSAPP_URL" type="url" placeholder="https://wa.me/962..." /></label>
+            </div>
+            <div class="card">
+              <h3>Contact details</h3>
+              <label>Support email<input name="SUPPORT_EMAIL" type="email" /></label>
+              <label>Service numbers <span class="hint">(one per line)</span>
+                <textarea name="SERVICE_NUMBERS" rows="4"></textarea>
+              </label>
+            </div>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <!-- Store / offer editor -->
+  <dialog id="editor">
+    <form id="editor-form" method="dialog">
+      <h2 id="editor-title"></h2>
+      <div id="editor-fields"></div>
+      <p class="form-error" id="editor-error" hidden></p>
+      <div class="dialog-actions">
+        <button class="btn ghost" type="button" id="editor-cancel">Cancel</button>
+        <button class="btn primary" type="submit" id="editor-save">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Delete confirmation -->
+  <dialog id="confirm">
+    <form method="dialog">
+      <h2>Delete?</h2>
+      <p id="confirm-text"></p>
+      <div class="dialog-actions">
+        <button class="btn ghost" value="cancel">Cancel</button>
+        <button class="btn danger" value="ok">Delete</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
